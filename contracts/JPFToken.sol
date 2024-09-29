@@ -7,4 +7,9 @@ contract JPFToken is ERC20 {
     constructor(uint256 initialSupply) ERC20("JPF", "JPF") {
         _mint(msg.sender, initialSupply);
     }
+
+    function addNumber() public pure returns (uint256) {
+        uint256 number = 0;
+        return number;
+    }
 }
