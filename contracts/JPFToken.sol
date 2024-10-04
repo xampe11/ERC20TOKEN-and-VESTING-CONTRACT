@@ -4,12 +4,8 @@ pragma solidity ^0.8.20;
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract JPFToken is ERC20 {
-    constructor(uint256 initialSupply) ERC20("JPF", "JPF") {
-        _mint(msg.sender, initialSupply);
-    }
-
-    function addNumber() public pure returns (uint256) {
-        uint256 number = 0;
-        return number;
+    constructor(uint256 initialSupply, string tokenName, string tokenSymbol) {
+        ERC20.init(tokenName, tokenSymbol)
+        //_mint(msg.sender, initialSupply);
     }
 }
