@@ -1,9 +1,16 @@
 require("@nomicfoundation/hardhat-toolbox")
-require("@nomiclabs/hardhat-etherscan")
 require("dotenv").config()
 require("hardhat-deploy")
 
 /** @type import('hardhat/config').HardhatUserConfig */
+
+const PRIVATE_KEY = process.env.PRIVATE_KEY
+const SEPOLIA_RPC_URL = process.env.SEPOLIA_RPC_URL
+
+//const MAINNET_RPC_URL = process.env.MAINNET_RPC_URL
+const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY
+
+const REPORT_GAS = process.env.REPORT_GAS
 module.exports = {
     defaultNetwork: "hardhat",
     networks: {
@@ -15,37 +22,28 @@ module.exports = {
             chainId: 31337,
         },
         localhost: {
-            accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+            accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
             chainId: 31337,
         },
         sepolia: {
-            url: process.env.SEPOLIA_RPC_URL,
-            accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+            url: SEPOLIA_RPC_URL,
+            accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
             //   accounts: {
             //     mnemonic: MNEMONIC,
             //   },
             saveDeployments: true,
             chainId: 11155111,
         },
-        mainnet: {
-            url: process.env.MAINNET_RPC_URL,
-            accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
-            //   accounts: {
-            //     mnemonic: MNEMONIC,
-            //   },
-            saveDeployments: true,
-            chainId: 1,
-        },
     },
     etherscan: {
         // npx hardhat verify --network <NETWORK> <CONTRACT_ADDRESS> <CONSTRUCTOR_PARAMETERS>
         apiKey: {
-            sepolia: process.env.ETHERSCAN_API_KEY,
+            sepolia: ETHERSCAN_API_KEY,
         },
         customChains: [],
     },
     gasReporter: {
-        enabled: process.env.REPORT_GAS,
+        enabled: REPORT_GAS,
         currency: "USD",
         outputFile: "gas-report.txt",
         noColors: true,
@@ -63,5 +61,17 @@ module.exports = {
     mocha: {
         timeout: 200000, // 200 seconds max for running tests
     },
-    solidity: "0.8.24",
+    solidity: {
+        compilers: [
+            {
+                version: "0.8.7",
+            },
+            {
+                version: "0.8.24",
+            },
+            {
+                version: "0.8.20",
+            },
+        ],
+    },
 }
