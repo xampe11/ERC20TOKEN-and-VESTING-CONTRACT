@@ -1,6 +1,10 @@
 const { ethers } = require("hardhat")
 
-async function createToken() {}
+async function createToken() {
+
+
+    
+}
 
 createToken()
     .then(() => process.exit(0))
