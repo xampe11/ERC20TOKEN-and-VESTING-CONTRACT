@@ -11,7 +11,7 @@ contract JPFToken is ERC20, Ownable {
     // Initial supply in tokens (not wei)
     uint256 private constant INITIAL_SUPPLY = 1000000;
 
-    constructor() ERC20("MyToken", "MTK") Ownable(msg.sender) {
+    constructor() ERC20("JPFToken", "JPF") Ownable(msg.sender) {
         // Mint initial supply to contract creator
         _mint(msg.sender, INITIAL_SUPPLY * (10 ** decimals()));
     }

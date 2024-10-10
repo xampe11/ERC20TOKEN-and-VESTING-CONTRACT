@@ -1,6 +1,8 @@
 require("@nomicfoundation/hardhat-toolbox")
 require("hardhat-deploy")
 require("dotenv").config()
+require("@nomicfoundation/hardhat-ethers")
+require("hardhat-deploy-ethers")
 
 /** @type import('hardhat/config').HardhatUserConfig */
 
