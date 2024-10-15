@@ -46,6 +46,8 @@ async function main() {
     )
 
     const approval = await jpfTokenContract.approve(player2, 1000)
+    const approval2 = await jpfTokenContract.approve(player, 1000)
+    
 
     console.log("Approval successful!")
     console.log(`Proceeding to test the "transferFrom()" function...`)
@@ -61,17 +63,18 @@ async function main() {
     console.log("Transfer in progress...")
 
     const allowance = await jpfTokenContract.allowance(deployer, player2)
+    const allowance1 = await jpfTokenContract.allowance(player, player2)
+    const allowance2 = await jpfTokenContract.allowance(player2, deployer)
+    const allowance3 = await jpfTokenContract.allowance(deployer, player)
 
-    jpfTokenContract.connect(player2)
+    //jpfTokenContract.connect(player2)
 
-    console.log("Checking allowance of " + deployer + " : " + allowance)
+    console.log(allowance)
+    console.log(allowance1)
+    console.log(allowance2)
+    console.log(allowance3)
 
-    if (allowance == 0) {
-        console.log("Allowance is 0, cannot proceed")
-        process.abort
-    }
-
-    const transfer = await jpfTokenContract.transferFrom(deployer, player2, 1000)
+    try{const transfer = await jpfTokenContract.transferFrom(deployer, player, 1000)} catch(error){console.log("Transfer Unseccessful"+error)}
 
     console.log("Transfer Complete!")
     console.log("Checking new balances...")
