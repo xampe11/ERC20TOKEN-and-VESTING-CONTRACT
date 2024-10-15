@@ -19,7 +19,7 @@ module.exports = {
             chainId: 31337,
         },
         localhost: {
-            accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
+            //accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
             chainId: 31337,
         },
         sepolia: {
@@ -54,6 +54,7 @@ module.exports = {
         player: {
             default: 1,
         },
+        player2: { default: 2 },
     },
     mocha: {
         timeout: 200000, // 200 seconds max for running tests
