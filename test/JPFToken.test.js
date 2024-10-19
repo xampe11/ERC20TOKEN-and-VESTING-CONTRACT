@@ -1,4 +1,5 @@
 const { deployments, getNamedAccounts, network, ethers } = require("hardhat")
+const { expect } = require("chai")
 
 describe("ERC20", function () {
     let jpfTokenContract
@@ -18,9 +19,10 @@ describe("ERC20", function () {
         console.log("Created accounts...")
         // Deploy a new token contract for each test
         jpfToken = await jpfTokenContract.deploy()
+        await jpfToken.deployed()
 
         console.log("Deploying contract...")
-        console.log(jpfToken)
+        //console.log(jpfToken)
 
         console.log("Contract Deployed and accounts assigned")
 
@@ -42,7 +44,7 @@ describe("ERC20", function () {
             await jpfToken.connect(acc).approve(acc2, 50)
 
             // player2 transfers 50 tokens from player to themselves
-            await jpfToken.connect(player2).transferFrom(acc, acc2, 50)
+            await jpfToken.connect(acc2).transferFrom(acc, acc2, 50)
 
             // Check balances
             expect(await jpfToken.balanceOf(acc)).to.equal(50)
@@ -51,24 +53,24 @@ describe("ERC20", function () {
 
         it("Should fail if the sender doesn't have enough tokens", async function () {
             // Approve player2 to spend 100 tokens on behalf of player
-            await jpfToken.connect(acc).approve(acc2.address, 100)
+            await jpfToken.connect(acc).approve(acc2, 100)
 
             // Try to transfer 100 tokens from player to player2 (should fail as player has 0 tokens)
             await expect(
-                jpfToken.connect(acc2).transferFrom(acc.address, acc2.address, 100)
+                jpfToken.connect(acc2).transferFrom(acc, acc2, 100)
             ).to.be.revertedWith("ERC20: transfer amount exceeds balance")
         })
 
         it("Should fail if the spender doesn't have enough allowance", async function () {
             // Transfer 100 tokens from deployer to player
-            await jpfToken.transfer(acc.address, 100)
+            await jpfToken.transfer(acc, 100)
 
             // Approve player2 to spend 50 tokens on behalf of player
-            await jpfToken.connect(acc).approve(acc2.address, 50)
+            await jpfToken.connect(acc).approve(acc2, 50)
 
             // Try to transfer 100 tokens from player to player2 (should fail due to insufficient allowance)
             await expect(
-                jpfToken.connect(acc2).transferFrom(acc.address, acc2.address, 100)
+                jpfToken.connect(acc2).transferFrom(acc, acc2, 100)
             ).to.be.revertedWith("ERC20: insufficient allowance")
         })
     })
