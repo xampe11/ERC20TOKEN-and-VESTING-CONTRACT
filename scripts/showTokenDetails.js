@@ -28,7 +28,7 @@ async function main() {
 
     const transferTest = await jpfTokenContract.transfer(
         player,
-        BigInt(100) * BigInt(10) ** decimals
+        BigInt(3000) * BigInt(10) ** decimals
     )
 
     console.log("Checking updated balances...")
@@ -44,10 +44,11 @@ async function main() {
     console.log(
         "Proceeding to approve the allowance of: " + deployer + " of 1000JPF to spender: " + player2
     )
+    await jpfTokenContract.connect(player).approve(deployer, 2000)
+    //const approval = await jpfTokenContract.approve(deployer, 2000)
+    //const approval2 = await jpfTokenContract.approve(player, 1000)
 
-    const approval = await jpfTokenContract.approve(player2, 1000)
-    const approval2 = await jpfTokenContract.approve(player, 1000)
-    
+    await jpfTokenContract.connect(deployer)
 
     console.log("Approval successful!")
     console.log(`Proceeding to test the "transferFrom()" function...`)
@@ -62,19 +63,16 @@ async function main() {
 
     console.log("Transfer in progress...")
 
-    const allowance = await jpfTokenContract.allowance(deployer, player2)
-    const allowance1 = await jpfTokenContract.allowance(player, player2)
-    const allowance2 = await jpfTokenContract.allowance(player2, deployer)
-    const allowance3 = await jpfTokenContract.allowance(deployer, player)
-
-    //jpfTokenContract.connect(player2)
+    const allowance = await jpfTokenContract.allowance(deployer, player)
 
     console.log(allowance)
-    console.log(allowance1)
-    console.log(allowance2)
-    console.log(allowance3)
 
-    try{const transfer = await jpfTokenContract.transferFrom(deployer, player, 1000)} catch(error){console.log("Transfer Unseccessful"+error)}
+    try {
+        await jpfTokenContract.connect(deployer).transferFrom(player, player2, 1000)
+        //const transfer = await jpfTokenContract.transferFrom(deployer, player, 1000)
+    } catch (error) {
+        console.log("Transfer Unseccessful " + error)
+    }
 
     console.log("Transfer Complete!")
     console.log("Checking new balances...")
