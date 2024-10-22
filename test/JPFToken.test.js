@@ -12,66 +12,84 @@ describe("ERC20", function () {
         console.log("Initializing beforeEach")
         jpfTokenContract = await ethers.getContractFactory("JPFToken")
         console.log("Created contract...")
-        accounts = await ethers.getSigners()
+        const accounts = await ethers.getSigners()
         dep = accounts[0]
         acc = accounts[1]
         acc2 = accounts[2]
         console.log("Created accounts...")
         // Deploy a new token contract for each test
         jpfToken = await jpfTokenContract.deploy()
-        await jpfToken.deployed()
-
-        console.log("Deploying contract...")
-        //console.log(jpfToken)
+        // Wait for the transaction to be mined
+        await jpfToken.waitForDeployment()
 
         console.log("Contract Deployed and accounts assigned")
-
-        /* const accounts = await getNamedAccounts()
-        dep = accounts[0]
-        acc = accounts[1]
-        acc2 = accounts[2]
-        // Contract deployment and getting test addresses
-        const jpfTokenContract = await ethers.utils.getContract("JPFToken")
-        jpfToken = jpfTokenContract.connect(dep) */
     })
 
     describe("transferFrom", function () {
         it("Should transfer tokens between accounts when approved", async function () {
-            // Transfer 100 tokens from deployer to player
-            await jpfToken.transfer(acc, 100)
+            // Transfer 100 tokens from deployer to acc
+            await jpfToken.transfer(acc.address, 100)
 
-            // Approve player2 to spend 50 tokens on behalf of player
-            await jpfToken.connect(acc).approve(acc2, 50)
+            // Approve acc2 to spend 50 tokens on behalf of acc
+            await jpfToken.connect(acc).approve(acc2.address, 50)
 
-            // player2 transfers 50 tokens from player to themselves
-            await jpfToken.connect(acc2).transferFrom(acc, acc2, 50)
+            // Check if approval was successful
+            expect(await jpfToken.allowance(acc.address, acc2.address)).to.equal(50)
+
+            // acc2 transfers 50 tokens from acc to themselves
+            await jpfToken.connect(acc2).transferFrom(acc.address, acc2.address, 50)
 
             // Check balances
-            expect(await jpfToken.balanceOf(acc)).to.equal(50)
-            expect(await jpfToken.balanceOf(acc2)).to.equal(50)
+            expect(await jpfToken.balanceOf(acc.address)).to.equal(50)
+            expect(await jpfToken.balanceOf(acc2.address)).to.equal(50)
         })
 
         it("Should fail if the sender doesn't have enough tokens", async function () {
-            // Approve player2 to spend 100 tokens on behalf of player
-            await jpfToken.connect(acc).approve(acc2, 100)
+            try {
+                // Log initial balances
+                console.log(
+                    "Initial balance of acc:",
+                    (await jpfToken.balanceOf(acc.address)).toString()
+                )
+                console.log(
+                    "Initial balance of acc2:",
+                    (await jpfToken.balanceOf(acc2.address)).toString()
+                )
 
-            // Try to transfer 100 tokens from player to player2 (should fail as player has 0 tokens)
-            await expect(
-                jpfToken.connect(acc2).transferFrom(acc, acc2, 100)
-            ).to.be.revertedWith("ERC20: transfer amount exceeds balance")
+                // Approve acc2 to spend 100 tokens on behalf of acc
+                await jpfToken.connect(acc).approve(acc2.address, 100n)
+                console.log("Approval successful")
+
+                // Log allowance
+                console.log(
+                    "Allowance of acc2:",
+                    (await jpfToken.allowance(acc.address, acc2.address)).toString()
+                )
+
+                // Try to transfer 100 tokens from acc to acc2 (should fail as acc has 0 tokens)
+
+                await expect(
+                    jpfToken.connect(acc2).transferFrom(acc.address, acc2.address, 100n)
+                ).to.be.revertedWithCustomError(jpfToken, `ERC20InsufficientBalance`)
+
+                console.log("Test completed successfully")
+            } catch (error) {
+                console.error("Error in test:", error)
+                throw error
+            }
         })
 
         it("Should fail if the spender doesn't have enough allowance", async function () {
-            // Transfer 100 tokens from deployer to player
-            await jpfToken.transfer(acc, 100)
+            // Transfer 100 tokens from deployer to acc
+            await jpfToken.transfer(acc.address, 100)
 
-            // Approve player2 to spend 50 tokens on behalf of player
-            await jpfToken.connect(acc).approve(acc2, 50)
+            // Approve acc2 to spend 50 tokens on behalf of acc
+            await jpfToken.connect(acc).approve(acc2.address, 50)
 
-            // Try to transfer 100 tokens from player to player2 (should fail due to insufficient allowance)
+            // Try to transfer 100 tokens from acc to acc2 (should fail due to insufficient allowance)
             await expect(
-                jpfToken.connect(acc2).transferFrom(acc, acc2, 100)
-            ).to.be.revertedWith("ERC20: insufficient allowance")
+                jpfToken.connect(acc2).transferFrom(acc.address, acc2.address, 100)
+            ).to.be.revertedWithCustomError(jpfToken, `ERC20InsufficientAllowance`)
         })
     })
 })
