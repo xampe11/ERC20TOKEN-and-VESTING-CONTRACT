@@ -3,6 +3,7 @@ require("hardhat-deploy")
 require("dotenv").config()
 require("@nomicfoundation/hardhat-ethers")
 require("hardhat-deploy-ethers")
+require("@nomicfoundation/hardhat-chai-matchers");
 
 /** @type import('hardhat/config').HardhatUserConfig */
 
