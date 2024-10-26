@@ -8,7 +8,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
     const arguments = []
 
-    const jpfToken = await deploy("Lock", {
+    const tokenVesting = await deploy("TokenVesting", {
         from: deployer,
         args: arguments,
         log: true,
@@ -17,7 +17,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
     if (!developmentChains.includes(network.name) && process.env.ETHERSCAN_API_KEY) {
         log("Verifying...")
-        await verify(jpfToken.address, arguments)
+        await verify(tokenVesting.address, arguments)
     }
 
     log("---------------------------------")
