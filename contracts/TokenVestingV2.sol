@@ -65,7 +65,6 @@ contract TokenVestingV2 is Ownable2Step, ReentrancyGuard, Pausable {
      * @param _token Address of the token to be vested
      * @param _amount Total amount of tokens to be vested
      * @param _startTime Start time of the vesting period
-     * @param _duration Duration of the vesting period in seconds
      * @param _releaseInterval Time between releases in seconds
      * @param _releasePercentage Percentage of vested tokens to release each interval (in basis points)
      * @param _revocable Whether the vesting can be revoked by the owner
@@ -75,7 +74,6 @@ contract TokenVestingV2 is Ownable2Step, ReentrancyGuard, Pausable {
         address _token,
         uint256 _amount,
         uint256 _startTime,
-        uint256 _duration,
         uint256 _releaseInterval,
         uint256 _releasePercentage,
         bool _revocable
@@ -83,13 +81,14 @@ contract TokenVestingV2 is Ownable2Step, ReentrancyGuard, Pausable {
         if (_beneficiary == address(0)) revert InvalidAddress();
         if (_token == address(0)) revert InvalidAddress();
         if (_amount == 0) revert InvalidAmount();
-        if (_duration == 0) revert InvalidDuration();
         if (_releaseInterval == 0) revert InvalidReleaseInterval();
         if (_releasePercentage == 0 || _releasePercentage > 10000)
             revert InvalidReleasePercentage();
 
         IERC20 token = IERC20(_token);
         token.safeTransferFrom(msg.sender, address(this), _amount);
+
+        uint256 _duration = (_releaseInterval * 10000) / _releasePercentage;
 
         ReleaseSchedule memory releaseSchedule = ReleaseSchedule({
             releaseInterval: _releaseInterval,

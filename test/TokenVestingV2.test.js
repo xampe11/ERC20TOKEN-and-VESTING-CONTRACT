@@ -61,7 +61,6 @@ describe("TokenVesting", function () {
                 testToken.target,
                 TOTAL_AMOUNT,
                 startTime,
-                duration,
                 releaseInterval,
                 RELEASE_PERCENTAGE,
                 true
@@ -88,7 +87,6 @@ describe("TokenVesting", function () {
                 testToken.target,
                 TOTAL_AMOUNT,
                 startTime,
-                ONE_MONTH,
                 SIX_DAYS,
                 RELEASE_PERCENTAGE,
                 true
@@ -106,9 +104,7 @@ describe("TokenVesting", function () {
 
             const claimable = await tokenVesting.calculateClaimableAmount(beneficiary.address, 0)
             const expectedAmount =
-                (((BigInt(TOTAL_AMOUNT) * BigInt(SIX_DAYS)) / BigInt(ONE_MONTH)) *
-                    BigInt(RELEASE_PERCENTAGE)) /
-                BigInt(10000)
+                (BigInt(TOTAL_AMOUNT) * BigInt(RELEASE_PERCENTAGE)) / BigInt(10000)
             expect(claimable).to.equal(expectedAmount)
         })
 
@@ -176,7 +172,6 @@ describe("TokenVesting", function () {
                     testToken.target,
                     TOTAL_AMOUNT,
                     startTime,
-                    ONE_MONTH,
                     SIX_DAYS,
                     RELEASE_PERCENTAGE,
                     true
@@ -257,7 +252,6 @@ describe("TokenVesting", function () {
                         testToken.target,
                         TOTAL_AMOUNT,
                         startTime,
-                        ONE_MONTH,
                         SIX_DAYS,
                         RELEASE_PERCENTAGE,
                         true

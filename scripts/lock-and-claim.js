@@ -49,7 +49,6 @@ async function main() {
         token.target,
         AMOUNT,
         START_TIME,
-        DURATION,
         SIX_DAYS,
         RELEASE_PERCENTAGE,
         revocable
