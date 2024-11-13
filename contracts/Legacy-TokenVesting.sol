@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/access/Ownable2Step.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
 
-contract TokenVesting is Ownable2Step, ReentrancyGuard, Pausable {
+contract LegacyTokenVesting is Ownable2Step, ReentrancyGuard, Pausable {
     using SafeERC20 for IERC20;
 
     struct VestingSchedule {

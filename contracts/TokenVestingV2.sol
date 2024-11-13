@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/access/Ownable2Step.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
 
-contract TokenVesting is Ownable2Step, ReentrancyGuard, Pausable {
+contract TokenVestingV2 is Ownable2Step, ReentrancyGuard, Pausable {
     using SafeERC20 for IERC20;
 
     struct ReleaseSchedule {
@@ -29,9 +29,6 @@ contract TokenVesting is Ownable2Step, ReentrancyGuard, Pausable {
     // Mapping from beneficiary address to their vesting schedules
     mapping(address => VestingSchedule[]) public vestingSchedules;
 
-    // Mapping to track if a token is supported
-    mapping(address => bool) public supportedTokens;
-
     // Events
     event TokensLocked(
         address indexed beneficiary,
@@ -44,14 +41,11 @@ contract TokenVesting is Ownable2Step, ReentrancyGuard, Pausable {
     );
     event TokensClaimed(address indexed beneficiary, address indexed token, uint256 amount);
     event VestingRevoked(address indexed beneficiary, address indexed token, uint256 amount);
-    event TokenSupported(address indexed token);
-    event TokenUnsupported(address indexed token);
 
     // Errors
     error InvalidAddress();
     error InvalidAmount();
     error InvalidDuration();
-    error TokenNotSupported();
     error NoClaimableTokens();
     error NotRevocable();
     error AlreadyRevoked();
@@ -90,7 +84,6 @@ contract TokenVesting is Ownable2Step, ReentrancyGuard, Pausable {
         if (_token == address(0)) revert InvalidAddress();
         if (_amount == 0) revert InvalidAmount();
         if (_duration == 0) revert InvalidDuration();
-        if (!supportedTokens[_token]) revert TokenNotSupported();
         if (_releaseInterval == 0) revert InvalidReleaseInterval();
         if (_releasePercentage == 0 || _releasePercentage > 10000)
             revert InvalidReleasePercentage();
@@ -126,6 +119,20 @@ contract TokenVesting is Ownable2Step, ReentrancyGuard, Pausable {
             _releaseInterval,
             _releasePercentage
         );
+    }
+
+    /**
+     * @notice Pauses all vesting operations
+     */
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    /**
+     * @notice Unpauses all vesting operations
+     */
+    function unpause() external onlyOwner {
+        _unpause();
     }
 
     /**

@@ -8,7 +8,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
     const arguments = []
 
-    const tokenVesting = await deploy("TokenVesting", {
+    const tokenVesting = await deploy("TokenVestingV2", {
         from: deployer,
         args: arguments,
         log: true,
