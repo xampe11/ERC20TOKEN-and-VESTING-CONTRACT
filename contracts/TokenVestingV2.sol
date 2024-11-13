@@ -153,18 +153,7 @@ contract TokenVestingV2 is Ownable2Step, ReentrancyGuard, Pausable {
             return 0;
         }
 
-        // Calculate vested amount based on time
-        uint256 vestedAmount;
-        if (block.timestamp >= schedule.endTime) {
-            vestedAmount = schedule.totalAmount;
-        } else {
-            uint256 timeElapsed = block.timestamp - schedule.startTime;
-            uint256 vestingDuration = schedule.endTime - schedule.startTime;
-            vestedAmount = (schedule.totalAmount * timeElapsed) / vestingDuration;
-        }
-
-        // Calculate releasable amount based on release schedule
-        uint256 releasableAmount = vestedAmount - schedule.claimedAmount;
+        // Evaluates if the next release interval has been achieved
         if (block.timestamp < schedule.releaseSchedule.nextReleaseTime) {
             return 0;
         }
@@ -179,8 +168,8 @@ contract TokenVestingV2 is Ownable2Step, ReentrancyGuard, Pausable {
             maxReleasablePercentage = 10000;
         }
 
-        uint256 maxReleasableAmount = (vestedAmount * maxReleasablePercentage) / 10000;
-        return maxReleasableAmount > releasableAmount ? releasableAmount : maxReleasableAmount;
+        uint256 maxReleasableAmount = (schedule.totalAmount * maxReleasablePercentage) / 10000;
+        return maxReleasableAmount;
     }
 
     /**

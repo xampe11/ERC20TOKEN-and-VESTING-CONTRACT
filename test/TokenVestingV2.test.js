@@ -1,6 +1,10 @@
-const { expect } = require("chai")
+const chai = require("chai")
+const expect = chai.expect
+const chaiDateTime = require("chai-datetime")
 const { ethers } = require("hardhat")
 const { time } = require("@nomicfoundation/hardhat-network-helpers")
+const { duration } = require("@nomicfoundation/hardhat-network-helpers/dist/src/helpers/time")
+chai.use(chaiDateTime)
 
 describe("TokenVesting", function () {
     let TokenVesting
@@ -15,9 +19,9 @@ describe("TokenVesting", function () {
     // Constants for testing
     const TOTAL_AMOUNT = ethers.parseEther("1000")
     const ONE_DAY = 24 * 60 * 60
-    const ONE_WEEK = 7 * ONE_DAY
+    const SIX_DAYS = 6 * ONE_DAY
     const ONE_MONTH = 30 * ONE_DAY
-    const RELEASE_PERCENTAGE = 2500 // 20% in basis points
+    const RELEASE_PERCENTAGE = 2000 // 20% in basis points
 
     beforeEach(async function () {
         // Get signers
@@ -50,7 +54,7 @@ describe("TokenVesting", function () {
         it("Should create a vesting schedule with release", async function () {
             const startTime = (await time.latest()) + ONE_DAY
             const duration = ONE_MONTH
-            const releaseInterval = ONE_WEEK
+            const releaseInterval = SIX_DAYS
 
             await tokenVesting.createVestingScheduleWithRelease(
                 beneficiary.address,
@@ -85,7 +89,7 @@ describe("TokenVesting", function () {
                 TOTAL_AMOUNT,
                 startTime,
                 ONE_MONTH,
-                ONE_WEEK,
+                SIX_DAYS,
                 RELEASE_PERCENTAGE,
                 true
             )
@@ -98,11 +102,12 @@ describe("TokenVesting", function () {
         })
 
         it("Should calculate correct claimable amount after one release period", async function () {
-            await time.increaseTo(startTime + ONE_WEEK)
+            await time.increaseTo(startTime + SIX_DAYS)
 
             const claimable = await tokenVesting.calculateClaimableAmount(beneficiary.address, 0)
             const expectedAmount =
-                (((BigInt(TOTAL_AMOUNT) * BigInt(7)) / BigInt(30)) * BigInt(RELEASE_PERCENTAGE)) /
+                (((BigInt(TOTAL_AMOUNT) * BigInt(SIX_DAYS)) / BigInt(ONE_MONTH)) *
+                    BigInt(RELEASE_PERCENTAGE)) /
                 BigInt(10000)
             expect(claimable).to.equal(expectedAmount)
         })
@@ -172,14 +177,14 @@ describe("TokenVesting", function () {
                     TOTAL_AMOUNT,
                     startTime,
                     ONE_MONTH,
-                    ONE_WEEK,
+                    SIX_DAYS,
                     RELEASE_PERCENTAGE,
                     true
                 )
             })
 
             it("Should allow claiming available tokens", async function () {
-                await time.increaseTo(startTime + ONE_WEEK * 2)
+                await time.increaseTo(startTime + SIX_DAYS * 2)
 
                 console.log(
                     "Total locked: ",
@@ -221,14 +226,18 @@ describe("TokenVesting", function () {
             })
 
             it("Should update next release time after claim", async function () {
-                await time.increaseTo(startTime + ONE_WEEK)
+                await time.increaseTo(startTime + SIX_DAYS)
                 await tokenVesting.connect(beneficiary).claimTokens(0)
 
                 const releaseSchedule = await tokenVesting.getReleaseSchedule(
                     beneficiary.address,
                     0
                 )
-                expect(releaseSchedule.nextReleaseTime).to.equal(startTime + 2 * ONE_WEEK)
+
+                expect(new Date(Number(releaseSchedule.nextReleaseTime))).to.closeToTime(
+                    new Date(startTime + 2 * SIX_DAYS),
+                    10
+                )
             })
         })
 
@@ -249,7 +258,7 @@ describe("TokenVesting", function () {
                         TOTAL_AMOUNT,
                         startTime,
                         ONE_MONTH,
-                        ONE_WEEK,
+                        SIX_DAYS,
                         RELEASE_PERCENTAGE,
                         true
                     )

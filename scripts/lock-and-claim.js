@@ -3,8 +3,13 @@ const { time } = require("@nomicfoundation/hardhat-network-helpers")
 
 const AMOUNT = ethers.parseEther("100")
 
-const DURATION = 30 * 24 * 60 * 60 // 1 month
 let revocable = true
+const ONE_DAY = 24 * 60 * 60
+const SIX_DAYS = 6 * ONE_DAY
+const ONE_MONTH = 30 * ONE_DAY
+const RELEASE_PERCENTAGE = 2000 // 20% in basis points
+
+const DURATION = ONE_MONTH
 
 async function main() {
     console.log("Getting contract information...")
@@ -14,7 +19,7 @@ async function main() {
 
     console.log("deployer: ", deployer.address)
 
-    const tokenVesting = await ethers.getContract("TokenVesting")
+    const tokenVesting = await ethers.getContract("TokenVestingV2")
 
     console.log("Token Contract: ", token.target)
     console.log("Vesting Contract: ", tokenVesting.target)
@@ -26,8 +31,6 @@ async function main() {
         "Balance of deployer: ",
         (await token.balanceOf(deployer.address)) / BigInt(10) ** BigInt(await token.decimals())
     )
-    console.log("Adding token to supported tokens...")
-    await tokenVesting.addSupportedToken(token.target)
 
     console.log("Approving allowance to contract...")
 
@@ -41,26 +44,28 @@ async function main() {
 
     console.log("Creating vesting schedule...")
 
-    await tokenVesting.createVestingSchedule(
+    await tokenVesting.createVestingScheduleWithRelease(
         deployer.address,
         token.target,
         AMOUNT,
         START_TIME,
         DURATION,
+        SIX_DAYS,
+        RELEASE_PERCENTAGE,
         revocable
     )
 
     console.log("Vesting schedule created successfully.")
     console.log(
         "Vesting Schedule details: ",
-        await tokenVesting.getVestingSchedule(deployer.address, 0)
+        await tokenVesting.vestingSchedules(deployer.address, 0)
     )
 
     console.log("Moving time forward...")
 
-    time.increase(DURATION / 2)
+    time.increase(SIX_DAYS * 2)
 
-    console.log("Moved to 50% of the duration.")
+    console.log("Moved 2 intervals forward.")
 
     console.log(
         "Balance of deployer: ",
@@ -80,9 +85,12 @@ async function main() {
 
     console.log("Checking total remaining locked tokens...")
 
+    const schedule = await tokenVesting.vestingSchedules(deployer.address, 0)
+
     console.log(
         "Total remaining tokens: ",
-        (await tokenVesting.checkRemainingTokens(0)) / BigInt(10) ** BigInt(await token.decimals())
+        (schedule.totalAmount - schedule.claimedAmount) /
+            BigInt(10) ** BigInt(await token.decimals())
     )
 }
 main()
