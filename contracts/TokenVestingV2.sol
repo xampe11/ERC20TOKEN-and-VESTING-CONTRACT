@@ -183,6 +183,10 @@ contract TokenVestingV2 is Ownable2Step, ReentrancyGuard, Pausable {
 
         if (claimableAmount == 0) revert NoClaimableTokens();
 
+        if (claimableAmount > (schedule.totalAmount - schedule.claimedAmount)) {
+            claimableAmount = schedule.totalAmount - schedule.claimedAmount;
+        }
+
         schedule.claimedAmount += claimableAmount;
 
         // Update next release time
