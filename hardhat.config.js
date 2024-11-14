@@ -3,11 +3,11 @@ require("hardhat-deploy")
 require("dotenv").config()
 require("@nomicfoundation/hardhat-ethers")
 require("hardhat-deploy-ethers")
-require("@nomicfoundation/hardhat-chai-matchers");
+require("@nomicfoundation/hardhat-chai-matchers")
 
 /** @type import('hardhat/config').HardhatUserConfig */
 
-const { SEPOLIA_URL, PRIVATE_KEY, ETHERSCAN_API_KEY, REPORT_GAS } = process.env
+const { SEPOLIA_URL, PRIVATE_KEY, PRIVATE_KEY_PLAYER, ETHERSCAN_API_KEY, REPORT_GAS } = process.env
 
 module.exports = {
     defaultNetwork: "hardhat",
@@ -25,7 +25,7 @@ module.exports = {
         },
         sepolia: {
             url: SEPOLIA_URL,
-            accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
+            accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [], // { deployer: { PRIVATE_KEY }, player: { PRIVATE_KEY_PLAYER } },
             //   accounts: {
             //     mnemonic: MNEMONIC,
             //   },
