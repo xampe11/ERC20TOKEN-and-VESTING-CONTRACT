@@ -16,7 +16,7 @@
         "chai": "^4.2.0",
         "chai-datetime": "^1.8.1",
         "dotenv": "^16.4.5",
-        "ethers": "6.6.2",
+        "ethers": "6.6.4",
         "hardhat": "^2.22.10",
         "hardhat-deploy-ethers": "^0.4.2",
         "hardhat-gas-reporter": "^2.2.1",
