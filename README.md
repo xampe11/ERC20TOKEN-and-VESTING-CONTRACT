@@ -20,12 +20,4 @@ ERC20 Token Launch with Custom Vesting Schedule
    - Thoroughly test the smart contracts on a testnet to ensure functionality and security.
    - Perform a comprehensive security audit to identify and fix potential vulnerabilities.
 
-4. **Documentation:**
 
-   - Provide clear and concise documentation for both the ERC20 token and the vesting schedule contracts.
-   - Include deployment instructions, explanations of the code, and guidelines for interacting with the contracts.
-
-5. **Deployment:**
-   - Deploy the ERC20 token and vesting schedule contracts on the Ethereum mainnet.
-   - Ensure the contracts are properly initialized and integrated with the planned vesting schedule.
-# ERC20TOKEN
