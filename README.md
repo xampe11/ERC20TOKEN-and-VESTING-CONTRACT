@@ -104,16 +104,6 @@ npx hardhat deploy --network your-network
 Make sure to update the network object within the hardhat.config file with its proper attributes.
 
 
-### Data Flow
-
-Describe how data flows through your system:
-
-1. User submits request from frontend
-2. Request is authenticated by middleware
-3. API server processes request and queries database
-4. Response is formatted and returned to frontend
-5. Frontend updates UI based on response
-
 ## 👥 Contributing
 
 Contributions are always welcome!
